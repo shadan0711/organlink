@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import AdminHeader from "./AdminHeader";
 
 const groupActivities = (activities) => {
     const groups = {};
@@ -45,7 +46,7 @@ const AdminDashboard = () => {
 
             setError(
                 error.response?.data?.message ||
-                    "Failed to load admin dashboard"
+                "Failed to load admin dashboard"
             );
         } finally {
             setLoading(false);
@@ -179,79 +180,10 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-950 text-white">
 
-            {/* Header */}
-            <header className="border-b border-slate-800">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8">
-
-                    <div className="h-20 flex items-center justify-between">
-
-                        {/* Brand */}
-                        <div>
-                            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                                OrganLink
-                            </p>
-
-                            <h1 className="mt-1 text-xl font-semibold">
-                                Admin Console
-                            </h1>
-                        </div>
-
-                        {/* Navigation */}
-                        <nav className="hidden md:flex items-center gap-6 text-sm">
-
-                            <Link
-                                to="/admin"
-                                className="text-white"
-                            >
-                                Overview
-                            </Link>
-
-                            <Link
-                                to="/admin/organizations"
-                                className="text-slate-500 hover:text-slate-200 transition"
-                            >
-                                Organizations
-                            </Link>
-
-                            <Link
-                                to="/admin/users"
-                                className="text-slate-500 hover:text-slate-200 transition"
-                            >
-                                Users
-                            </Link>
-
-                            <Link
-                                to="/admin/audit-logs"
-                                className="text-slate-500 hover:text-slate-200 transition"
-                            >
-                                Audit Logs
-                            </Link>
-
-                        </nav>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-3">
-
-                            <button
-                                onClick={fetchDashboard}
-                                className="hidden sm:block text-sm text-slate-500 hover:text-white transition"
-                            >
-                                Refresh
-                            </button>
-
-                            <button
-                                onClick={logout}
-                                className="text-sm text-slate-400 hover:text-white transition"
-                            >
-                                Logout
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-            </header>
+            <AdminHeader
+                onRefresh={fetchDashboard}
+                refreshing={loading}
+            />
 
 
             <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
@@ -411,26 +343,6 @@ const AdminDashboard = () => {
                         />
 
 
-                        {/* Network */}
-                        <OperationBlock
-                            title="Network"
-                            rows={[
-                                {
-                                    label: "System",
-                                    value: "Operational",
-                                    valueClass: "text-green-400",
-                                },
-                                {
-                                    label: "Active transfers",
-                                    value: stats.activeTransfers,
-                                },
-                                {
-                                    label: "Pending requests",
-                                    value: stats.pendingRequests,
-                                },
-                            ]}
-                        />
-
                     </div>
 
                 </section>
@@ -482,12 +394,11 @@ const AdminDashboard = () => {
                                 return (
                                     <div
                                         key={`${group.entityType}-${group.entityId}`}
-                                        className={`flex items-center justify-between gap-6 py-4 ${
-                                            index !==
-                                            visibleActivities.length - 1
+                                        className={`flex items-center justify-between gap-6 py-4 ${index !==
+                                                visibleActivities.length - 1
                                                 ? "border-b border-slate-900"
                                                 : ""
-                                        }`}
+                                            }`}
                                     >
 
                                         <div className="flex items-center gap-4 min-w-0">
@@ -593,20 +504,18 @@ const OperationBlock = ({ title, rows }) => {
                 {rows.map((row, index) => (
                     <div
                         key={row.label}
-                        className={`flex items-center justify-between py-2.5 ${
-                            index !== rows.length - 1
+                        className={`flex items-center justify-between py-2.5 ${index !== rows.length - 1
                                 ? "border-b border-slate-900"
                                 : ""
-                        }`}
+                            }`}
                     >
                         <span className="text-sm text-slate-500">
                             {row.label}
                         </span>
 
                         <span
-                            className={`text-sm font-medium ${
-                                row.valueClass || "text-slate-300"
-                            }`}
+                            className={`text-sm font-medium ${row.valueClass || "text-slate-300"
+                                }`}
                         >
                             {row.value}
                         </span>

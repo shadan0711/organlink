@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import AdminHeader from "./AdminHeader";
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -77,28 +77,23 @@ const Users = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-8">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-gray-50">
+            <AdminHeader
+                onRefresh={fetchUsers}
+                refreshing={loading}
+            />
+            <div className="max-w-7xl mx-auto p-6 md:p-8">
 
-                {/* Header */}
                 <div className="mb-8">
-                    <Link
-                        to="/admin"
-                        className="text-sm text-gray-500 hover:text-gray-900"
-                    >
-                        ← Back to Dashboard
-                    </Link>
+                    <h1 className="text-3xl font-semibold text-gray-900">
+                        Users
+                    </h1>
 
-                    <div className="mt-4">
-                        <h1 className="text-3xl font-semibold text-gray-900">
-                            Users
-                        </h1>
-
-                        <p className="mt-1 text-gray-500">
-                            Manage registered users and account access.
-                        </p>
-                    </div>
+                    <p className="mt-1 text-gray-500">
+                        Manage registered users and account access.
+                    </p>
                 </div>
+
 
                 {/* Error */}
                 {error && (
@@ -119,8 +114,8 @@ const Users = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${activeTab === tab.key
-                                    ? "border-gray-900 bg-gray-900 text-white"
-                                    : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
+                                ? "border-gray-900 bg-gray-900 text-white"
+                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-100"
                                 }`}
                         >
                             {tab.label}
@@ -193,8 +188,8 @@ const Users = () => {
                                     <div className="md:min-w-[100px]">
                                         <span
                                             className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${user.isActive
-                                                    ? "bg-green-50 text-green-700"
-                                                    : "bg-red-50 text-red-700"
+                                                ? "bg-green-50 text-green-700"
+                                                : "bg-red-50 text-red-700"
                                                 }`}
                                         >
                                             {user.isActive ? "Active" : "Inactive"}

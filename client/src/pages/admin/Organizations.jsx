@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import AdminHeader from "./AdminHeader";
 
 
 const Organizations = () => {
@@ -71,40 +72,10 @@ const Organizations = () => {
     return (
         <div className="min-h-screen bg-slate-950 text-white">
 
-            {/* Header */}
-            <header className="border-b border-slate-800">
-                <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
-
-                    <div>
-                        <h1 className="text-2xl font-bold">
-                            Organizations
-                        </h1>
-
-                        <p className="text-sm text-slate-400 mt-1">
-                            Manage hospitals and organ banks
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-
-                        <button
-                            onClick={fetchOrganizations}
-                            className="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 transition"
-                        >
-                            Refresh
-                        </button>
-
-                        <button
-                            onClick={logout}
-                            className="px-4 py-2 rounded-lg bg-white text-black font-medium hover:bg-slate-200 transition"
-                        >
-                            Logout
-                        </button>
-
-                    </div>
-
-                </div>
-            </header>
+            <AdminHeader
+                onRefresh={fetchOrganizations}
+                refreshing={loading}
+            />
 
             <main className="max-w-7xl mx-auto px-8 py-8">
 
