@@ -133,4 +133,5 @@ module.exports = {
   getAllUsers,
   getUserById,
   updateUserStatus,
+
 };

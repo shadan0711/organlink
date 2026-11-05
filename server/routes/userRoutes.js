@@ -4,6 +4,7 @@ const {
   getAllUsers,
   getUserById,
   updateUserStatus,
+
 } = require("../controllers/userController");
 
 const {
@@ -28,6 +29,7 @@ router.get(
   authorize("admin"),
   getAllUsers
 );
+
 
 // Admin: get single user
 router.get(
