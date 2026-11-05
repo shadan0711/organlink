@@ -4,6 +4,8 @@ const {
   createOrgan,
   getOrgans,
   getOrganById,
+  updateOrgan,
+  cancelOrgan,
 } = require("../controllers/organController");
 
 const {
@@ -32,6 +34,19 @@ router.post(
   protect,
   authorize("organBank"),
   createOrgan
+);
+
+router.patch(
+  "/:id",
+  protect,
+  authorize("organBank"),
+  updateOrgan
+);
+router.patch(
+  "/:id/cancel",
+  protect,
+  authorize("organBank"),
+  cancelOrgan
 );
 
 module.exports = router;
