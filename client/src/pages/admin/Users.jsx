@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminHeader from "./AdminHeader";
+import api from "../../services/api";
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -8,36 +9,28 @@ const Users = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fetchUsers = async () => {
-        try {
-            setLoading(true);
-            setError("");
+   
+const fetchUsers = async () => {
+    try {
+        setLoading(true);
+        setError("");
 
-            const token = localStorage.getItem("token");
+        const response = await api.get("/users");
 
-            const response = await fetch(
-                "http://localhost:5001/api/users",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        setUsers(response.data.users || []);
+    } catch (error) {
+        console.error("Fetch Users Error:", error);
 
-            const data = await response.json();
+        setError(
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to fetch users"
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
-            if (!response.ok) {
-                throw new Error(data.message || "Failed to fetch users");
-            }
-
-            setUsers(data.users || []);
-        } catch (error) {
-            console.error("Fetch Users Error:", error);
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
         fetchUsers();

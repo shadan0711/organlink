@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import api from "../../services/api";
 
 const UserDetails = () => {
   const { userId } = useParams();
@@ -11,87 +12,65 @@ const UserDetails = () => {
   const [updating, setUpdating] = useState(false);
 
   const fetchUser = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  try {
+    setLoading(true);
+    setError("");
 
-      const token = localStorage.getItem("token");
+    const response = await api.get(`/users/${userId}`);
 
-      const response = await fetch(
-        `http://localhost:5001/api/users/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    setUser(response.data.user);
+  } catch (error) {
+    console.error("Fetch User Error:", error);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch user");
-      }
-
-      setUser(data.user);
-    } catch (error) {
-      console.error("Fetch User Error:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setError(
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch user"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchUser();
   }, [userId]);
 
   const updateStatus = async () => {
-    if (!user) return;
+  if (!user) return;
 
-    const action = user.isActive ? "deactivate" : "activate";
+  const action = user.isActive ? "deactivate" : "activate";
 
-    const confirmed = window.confirm(
-      `Are you sure you want to ${action} this user?`
+  const confirmed = window.confirm(
+    `Are you sure you want to ${action} this user?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setUpdating(true);
+    setError("");
+
+    const response = await api.patch(
+      `/users/${userId}/status`,
+      {
+        isActive: !user.isActive,
+      }
     );
 
-    if (!confirmed) return;
+    setUser(response.data.user);
+  } catch (error) {
+    console.error("Update User Status Error:", error);
 
-    try {
-      setUpdating(true);
-      setError("");
-
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `http://localhost:5001/api/users/${userId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            isActive: !user.isActive,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to update user status"
-        );
-      }
-
-      setUser(data.user);
-    } catch (error) {
-      console.error("Update User Status Error:", error);
-      setError(error.message);
-    } finally {
-      setUpdating(false);
-    }
-  };
+    setError(
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update user status"
+    );
+  } finally {
+    setUpdating(false);
+  }
+};
 
   const getRoleLabel = (role) => {
     if (role === "organBank") return "Organ Bank";

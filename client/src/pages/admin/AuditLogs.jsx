@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminHeader from "./AdminHeader";
-
+import api from "../../services/api";
 
 const AuditLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -10,41 +10,29 @@ const AuditLogs = () => {
     const [error, setError] = useState("");
 
     const fetchLogs = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    try {
+        setLoading(true);
+        setError("");
 
-            const token = localStorage.getItem("token");
+        const query = entityType
+            ? `?entityType=${entityType}&limit=15`
+            : "?limit=15";
 
-            const query = entityType
-                ? `?entityType=${entityType}&limit=15`
-                : "?limit=15";
+        const response = await api.get(`/audit${query}`);
 
-            const response = await fetch(
-                `http://localhost:5001/api/audit${query}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        setLogs(response.data.logs || []);
+    } catch (error) {
+        console.error("Fetch Audit Logs Error:", error);
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to fetch audit logs"
-                );
-            }
-
-            setLogs(data.logs || []);
-        } catch (error) {
-            console.error("Fetch Audit Logs Error:", error);
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+        setError(
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to fetch audit logs"
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
         fetchLogs();
