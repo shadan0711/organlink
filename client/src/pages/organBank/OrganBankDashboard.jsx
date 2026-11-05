@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
+import OrganBankLayout from "../../components/OrganBankLayout";
 
 const OrganBankDashboard = () => {
-    const { user, logout } = useAuth();
 
     const [stats, setStats] = useState(null);
     const [requests, setRequests] = useState([]);
@@ -13,20 +12,6 @@ const OrganBankDashboard = () => {
 
     const [error, setError] = useState("");
     const [actionMessage, setActionMessage] = useState("");
-
-    const [showOrganForm, setShowOrganForm] = useState(false);
-    const [organLoading, setOrganLoading] = useState(false);
-
-    const [organForm, setOrganForm] = useState({
-        organType: "",
-        bloodGroup: "",
-        expiresAt: "",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-        description: "",
-    });
 
     const fetchDashboard = async () => {
         try {
@@ -38,6 +23,7 @@ const OrganBankDashboard = () => {
 
             setStats(dashboardResponse.data.stats);
             setRequests(requestsResponse.data.requests);
+
         } catch (error) {
             console.error("Organ Bank Dashboard Error:", error);
 
@@ -92,107 +78,18 @@ const OrganBankDashboard = () => {
         }
     };
 
-    const handleAddOrgan = async (e) => {
-        e.preventDefault();
-
-        setOrganLoading(true);
-        setError("");
-        setActionMessage("");
-
-        try {
-            const payload = {
-                organType: organForm.organType,
-                bloodGroup: organForm.bloodGroup,
-                expiresAt: new Date(organForm.expiresAt).toISOString(),
-                location: {
-                    address: organForm.address,
-                    city: organForm.city,
-                    state: organForm.state,
-                    pincode: organForm.pincode,
-                },
-                description: organForm.description,
-            };
-
-            const response = await api.post("/organs", payload);
-
-            setActionMessage(response.data.message);
-
-            setOrganForm({
-                organType: "",
-                bloodGroup: "",
-                expiresAt: "",
-                address: "",
-                city: "",
-                state: "",
-                pincode: "",
-                description: "",
-            });
-
-            setShowOrganForm(false);
-
-            await fetchDashboard();
-
-        } catch (error) {
-            console.error("Add Organ Error:", error);
-
-            setError(
-                error.response?.data?.message ||
-                "Unable to add organ."
-            );
-        } finally {
-            setOrganLoading(false);
-        }
-    };
-
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
-                Loading dashboard...
-            </div>
+            <OrganBankLayout>
+                <div className="flex min-h-[80vh] items-center justify-center text-slate-400">
+                    Loading dashboard...
+                </div>
+            </OrganBankLayout>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
-
-            {/* Navbar */}
-            <header className="border-b border-slate-800 bg-slate-900">
-                <div className="flex items-center justify-between px-6 py-4">
-
-                    <div>
-                        <h1 className="text-xl font-bold">
-                            OrganLink
-                        </h1>
-
-                        <p className="text-xs text-slate-400">
-                            Organ Bank Portal
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-
-                        <div className="hidden text-right sm:block">
-                            <p className="text-sm font-medium">
-                                Organ Bank
-                            </p>
-
-                            <p className="text-xs text-slate-400">
-                                {user?.role}
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={logout}
-                            className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-800 hover:text-white"
-                        >
-                            Logout
-                        </button>
-
-                    </div>
-
-                </div>
-            </header>
-
+        <OrganBankLayout>
 
             <main className="mx-auto max-w-7xl px-6 py-8">
 
@@ -205,205 +102,6 @@ const OrganBankDashboard = () => {
                     <p className="mt-2 text-slate-400">
                         Manage organs, requests and transfers.
                     </p>
-
-                    <div className="mt-5 flex flex-wrap gap-3">
-
-                        <button
-                            onClick={() => setShowOrganForm(!showOrganForm)}
-                            className="rounded-lg bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-500"
-                        >
-                            {showOrganForm ? "Close Form" : "+ Add Organ"}
-                        </button>
-
-                        <a
-                            href="/organ-bank/transfers"
-                            className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-500"
-                        >
-                            Manage Transfers
-                        </a>
-
-                    </div>
-
-                    {showOrganForm && (
-                        <form
-                            onSubmit={handleAddOrgan}
-                            className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
-                        >
-                            <h3 className="mb-5 text-xl font-semibold">
-                                Add New Organ
-                            </h3>
-
-                            <div className="grid gap-5 sm:grid-cols-2">
-
-                                {/* Organ Type */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        Organ Type
-                                    </label>
-
-                                    <select
-                                        required
-                                        value={organForm.organType}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, organType: e.target.value })
-                                        }
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    >
-                                        <option value="">Select organ</option>
-                                        {["kidney", "liver", "heart", "lung", "pancreas", "cornea"].map((organ) => (
-                                            <option key={organ} value={organ}>
-                                                {organ.charAt(0).toUpperCase() + organ.slice(1)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Blood Group */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        Blood Group
-                                    </label>
-
-                                    <select
-                                        required
-                                        value={organForm.bloodGroup}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, bloodGroup: e.target.value })
-                                        }
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    >
-                                        <option value="">Select blood group</option>
-                                        {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
-                                            <option key={group} value={group}>
-                                                {group}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Expiry */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        Expiry Date & Time
-                                    </label>
-
-                                    <input
-                                        type="datetime-local"
-                                        required
-                                        min={new Date().toISOString().slice(0, 16)}
-                                        value={organForm.expiresAt}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, expiresAt: e.target.value })
-                                        }
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    />
-                                </div>
-
-                                {/* Address */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        Address
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        required
-                                        value={organForm.address}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, address: e.target.value })
-                                        }
-                                        placeholder="Hospital address"
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    />
-                                </div>
-
-                                {/* City */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        City
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        required
-                                        value={organForm.city}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, city: e.target.value })
-                                        }
-                                        placeholder="City"
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    />
-                                </div>
-
-                                {/* State */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        State
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        required
-                                        value={organForm.state}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, state: e.target.value })
-                                        }
-                                        placeholder="State"
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    />
-                                </div>
-
-                                {/* Pincode */}
-                                <div>
-                                    <label className="mb-2 block text-sm text-slate-300">
-                                        Pincode
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        required
-                                        value={organForm.pincode}
-                                        onChange={(e) =>
-                                            setOrganForm({ ...organForm, pincode: e.target.value })
-                                        }
-                                        placeholder="Pincode"
-                                        className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                    />
-                                </div>
-
-                            </div>
-
-                            {/* Description */}
-                            <div className="mt-5">
-                                <label className="mb-2 block text-sm text-slate-300">
-                                    Description (Optional)
-                                </label>
-
-                                <textarea
-                                    rows="3"
-                                    value={organForm.description}
-                                    onChange={(e) =>
-                                        setOrganForm({ ...organForm, description: e.target.value })
-                                    }
-                                    placeholder="Additional information..."
-                                    className="w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-white"
-                                />
-                            </div>
-
-                            {/* Submit */}
-                            <div className="mt-6 flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={organLoading}
-                                    className="rounded-lg bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-500 disabled:opacity-50"
-                                >
-                                    {organLoading ? "Adding Organ..." : "Add Organ"}
-                                </button>
-                            </div>
-
-                        </form>
-                    )}
-
                 </div>
 
 
@@ -514,6 +212,7 @@ const OrganBankDashboard = () => {
                 )}
 
 
+
                 {/* Requests */}
                 <section className="mt-10">
 
@@ -567,7 +266,7 @@ const OrganBankDashboard = () => {
 
             </main>
 
-        </div>
+        </OrganBankLayout>
     );
 };
 

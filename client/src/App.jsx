@@ -15,7 +15,7 @@ import OrganizationDetails from "./pages/admin/OrganizationDetails";
 import Users from "./pages/admin/Users";
 import UserDetails from "./pages/admin/UserDetails";
 import AuditLogs from "./pages/admin/AuditLogs";
-
+import OrganInventory from "./pages/organBank/OrganInventory";
 const App = () => {
   return (
     <Routes>
@@ -39,6 +39,14 @@ const App = () => {
         element={
           <ProtectedRoute allowedRoles={["organBank"]}>
             <OrganBankDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/organ-bank/inventory"
+        element={
+          <ProtectedRoute allowedRoles={["organBank"]}>
+            <OrganInventory />
           </ProtectedRoute>
         }
       />

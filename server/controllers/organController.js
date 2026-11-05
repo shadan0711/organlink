@@ -79,8 +79,13 @@ const getOrgans = async (req, res) => {
 
     const filter = {};
 
-    // Only return available organs by default
-    filter.status = status || "available";
+    // Organ banks can view all organs by default.
+// Hospitals can view only available organs by default.
+if (status) {
+  filter.status = status;
+} else if (req.user.role === "hospital") {
+  filter.status = "available";
+}
 
     if (organType) {
       filter.organType = organType;

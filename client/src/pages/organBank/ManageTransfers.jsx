@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
+import OrganBankLayout from "../../components/OrganBankLayout";
 
 const ManageTransfers = () => {
     const [transfers, setTransfers] = useState([]);
@@ -92,40 +93,17 @@ const ManageTransfers = () => {
         }
     );
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+   if (loading) {
+    return (
+        <OrganBankLayout>
+            <div className="flex min-h-[80vh] items-center justify-center text-slate-400">
                 Loading transfers...
             </div>
-        );
-    }
-
+        </OrganBankLayout>
+    );
+}
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
-
-            {/* Header */}
-            <header className="border-b border-slate-800 bg-slate-900">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
-                    <div>
-                        <h1 className="text-xl font-bold">
-                            OrganLink
-                        </h1>
-
-                        <p className="text-xs text-slate-400">
-                            Transfer Management
-                        </p>
-                    </div>
-
-                    <Link
-                        to="/organ-bank"
-                        className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800"
-                    >
-                        Dashboard
-                    </Link>
-
-                </div>
-            </header>
+        <OrganBankLayout>
 
 
             <main className="mx-auto max-w-6xl px-6 py-8">
@@ -232,7 +210,7 @@ const ManageTransfers = () => {
 
             </main>
 
-        </div>
+        </OrganBankLayout>
     );
 };
 
